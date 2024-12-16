@@ -1,0 +1,23 @@
+.coin-list {
+  @apply bg-white rounded-lg shadow-sm p-6;
+}
+
+.coin-item {
+  @apply flex justify-between items-center py-3 border-b border-slate-100 last:border-0;
+}
+
+.coin-symbol {
+  @apply font-semibold text-slate-700;
+}
+
+.coin-status {
+  @apply text-sm text-slate-600;
+}
+
+.trend-up {
+  @apply text-emerald-600;
+}
+
+.trend-down {
+  @apply text-red-600;
+}

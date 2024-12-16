@@ -1,0 +1,27 @@
+.trade-history {
+  @apply bg-white rounded-lg shadow-sm p-6;
+}
+
+.trade-table {
+  @apply w-full;
+}
+
+.trade-header {
+  @apply grid grid-cols-5 gap-4 py-3 border-b border-slate-200 text-sm font-medium text-slate-600;
+}
+
+.trade-row {
+  @apply grid grid-cols-5 gap-4 py-3 border-b border-slate-100 last:border-0 text-sm;
+}
+
+.buy {
+  @apply text-emerald-600 font-medium;
+}
+
+.sell {
+  @apply text-red-600 font-medium;
+}
+
+.ok {
+  @apply text-emerald-600;
+}

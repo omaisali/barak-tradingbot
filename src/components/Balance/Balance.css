@@ -1,0 +1,64 @@
+.balance-card {
+  @apply bg-white rounded-lg shadow-sm p-6;
+}
+
+.section-title {
+  @apply text-lg font-semibold text-slate-800 mb-4;
+}
+
+.balance-table {
+  @apply w-full;
+  /* Add fixed height container */
+  height: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+.balance-header {
+  @apply grid grid-cols-4 gap-4 py-3 px-4 bg-slate-50 rounded-t-lg text-sm font-medium text-slate-600;
+  /* Make header sticky */
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.balance-body {
+  @apply divide-y divide-slate-100;
+  /* Make body scrollable */
+  overflow-y: auto;
+  /* Add custom scrollbar styling */
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f8fafc;
+}
+
+/* Webkit scrollbar styling */
+.balance-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.balance-body::-webkit-scrollbar-track {
+  @apply bg-slate-100 rounded-lg;
+}
+
+.balance-body::-webkit-scrollbar-thumb {
+  @apply bg-slate-300 rounded-lg;
+  &:hover {
+    @apply bg-slate-400;
+  }
+}
+
+.balance-row {
+  @apply grid grid-cols-4 gap-4 py-3 px-4 text-sm hover:bg-slate-50 transition-colors;
+}
+
+.asset-name {
+  @apply flex flex-col;
+}
+
+.asset-fullname {
+  @apply text-xs text-slate-500 mt-0.5;
+}
+
+.no-balance {
+  @apply py-8 text-center text-slate-500 text-sm;
+}
