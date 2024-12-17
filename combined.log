@@ -92,3 +92,7 @@
 {"level":"info","message":"Client connected","timestamp":"2024-12-16T12:22:48.867Z"}
 {"level":"info","message":"Client disconnected","timestamp":"2024-12-16T12:37:45.454Z"}
 {"level":"info","message":"Client connected","timestamp":"2024-12-16T12:37:45.689Z"}
+{"level":"info","message":"Server running on port 3000","timestamp":"2024-12-17T13:17:01.631Z"}
+{"level":"info","message":"Client connected","timestamp":"2024-12-17T13:17:22.530Z"}
+{"level":"info","message":"Client disconnected","timestamp":"2024-12-17T13:32:40.316Z"}
+{"level":"info","message":"Client connected","timestamp":"2024-12-17T13:32:40.578Z"}

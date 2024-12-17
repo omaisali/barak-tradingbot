@@ -1,123 +1,103 @@
-import React, { useState, useCallback, useEffect } from "react";
-import { Header } from "./components/Header/Header";
-import { Balance } from "./components/Balance/Balance";
-import { CoinList } from "./components/CoinList/CoinList";
-import { TradingParameters } from "./components/TradingParameters/TradingParameters";
-import { TradeHistory } from "./components/TradeHistory/TradeHistory";
-import { StatusBar } from "./components/StatusBar/StatusBar";
-import { Strategy } from "./components/Strategy/Strategy";
-import { LogView } from "./components/LogView/LogView";
-import { ActionButtons } from "./components/ActionButtons/ActionButtons";
-import { supportedCoins } from "./config/tradingConfig";
-import { useTradingConfig } from "./hooks/useTradingConfig";
-import { useSocket } from "./hooks/useSocket";
-import { useBalance } from "./hooks/useBalance";
-import { Trade, CoinStatus } from "./types/trading";
-import "./App.css";
+import React from 'react';
+import { Play, Pause } from 'lucide-react';
+import TradingParameters from './components/TradingParameters';
+import StrategySelector from './components/StrategySelector';
+import RecommendedCoins from './components/RecommendedCoins';
+import TradeHistory from './components/TradeHistory';
+import { useTrading } from './hooks/useTrading';
+import { useRecommendations } from './hooks/useRecommendations';
+import { exportTradesToCSV } from './utils/csv';
 
-const App: React.FC = () => {
-  const { config, updateConfig } = useTradingConfig();
-  const balances = useBalance();
-  const [isRunning, setIsRunning] = useState(false);
-  const [trades, setTrades] = useState<Trade[]>([]);
-  const [logs, setLogs] = useState<{ time: string; message: string }[]>([]);
-  const [status, setStatus] = useState("Idle");
+function App() {
+  const {
+    isRunning,
+    parameters,
+    trades,
+    strategies,
+    setParameters,
+    toggleBot,
+    toggleStrategy,
+    executeTrade,
+  } = useTrading({
+    tradeAmount: 1000,
+    profitTarget: 1.5,
+    analysisInterval: 5,
+    maxOpenPositions: 3,
+    currency: 'USDT',
+  });
 
-  // Convert supported coins to CoinStatus array for display
-  const coins: CoinStatus[] = Object.entries(supportedCoins).map(
-    ([symbol, config]) => ({
-      name: symbol,
-      ...config,
-    }),
-  );
+  const {
+    recommendations,
+    loading,
+    error,
+    refreshRecommendations,
+    toggleSelection,
+  } = useRecommendations();
 
-  // Socket event handlers
-  const handleTrade = useCallback((trade: Trade) => {
-    setTrades((prev) => [trade, ...prev].slice(0, 10)); // Keep last 10 trades
-    setLogs((prev) => [
-      {
-        time: new Date().toLocaleTimeString(),
-        message: `${trade.action} ${trade.coin} at ${trade.price} USD ${trade.status === "OK" ? "successful" : "failed"}.`,
-      },
-      ...prev,
-    ]);
-  }, []);
-
-  const handleStatus = useCallback(
-    ({ status: newStatus }: { status: string }) => {
-      setIsRunning(newStatus === "started");
-      setStatus(newStatus === "started" ? "Running" : "Stopped");
-      setLogs((prev) => [
-        {
-          time: new Date().toLocaleTimeString(),
-          message: `Bot ${newStatus === "started" ? "started" : "stopped"}`,
-        },
-        ...prev,
-      ]);
-    },
-    [],
-  );
-
-  const handleError = useCallback((error: string) => {
-    setLogs((prev) => [
-      {
-        time: new Date().toLocaleTimeString(),
-        message: `Error: ${error}`,
-      },
-      ...prev,
-    ]);
-  }, []);
-
-  // Initialize socket connection and handlers
-  const { startBot, stopBot, updateBotConfig } = useSocket(
-    handleTrade,
-    handleStatus,
-    handleError,
-  );
-
-  // Handle config updates
-  const handleConfigUpdate = useCallback(
-    (updates: Partial<typeof config>) => {
-      const newConfig = { ...config, ...updates };
-      updateConfig(newConfig);
-      updateBotConfig(newConfig);
-    },
-    [config, updateConfig, updateBotConfig],
-  );
-
-  // Handle bot start/stop
-  const handleStart = useCallback(() => {
-    startBot();
-  }, [startBot]);
-
-  const handleStop = useCallback(() => {
-    stopBot();
-  }, [stopBot]);
+  const handleExport = () => {
+    exportTradesToCSV(trades);
+  };
 
   return (
-    <div className="app">
-      <Header />
-      <StatusBar status={status} />
-      <div className="content">
-        <Balance balances={balances} />
-        <CoinList coins={coins} />
-        <TradingParameters
-          config={config}
-          onConfigChange={handleConfigUpdate}
-        />
-        <Strategy />
-      </div>
-      <div className="main-section">
-        <ActionButtons
-          isRunning={isRunning}
-          onStart={handleStart}
-          onStop={handleStop}
-        />
-        <TradeHistory trades={trades} />
-        <LogView logs={logs} />
+    <div className="min-h-screen bg-gray-100">
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">BTC Turk Trading Bot</h1>
+          <button
+            onClick={toggleBot}
+            className={`flex items-center gap-2 px-6 py-3 rounded-lg text-white transition-colors ${
+              isRunning ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'
+            }`}
+          >
+            {isRunning ? (
+              <>
+                <Pause className="w-5 h-5" />
+                Stop Bot
+              </>
+            ) : (
+              <>
+                <Play className="w-5 h-5" />
+                Start Bot
+              </>
+            )}
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="space-y-8">
+            <TradingParameters
+              parameters={parameters}
+              onUpdate={setParameters}
+            />
+            <StrategySelector
+              strategies={strategies}
+              onToggle={toggleStrategy}
+            />
+          </div>
+          <div className="space-y-8">
+            <RecommendedCoins
+              recommendations={recommendations}
+              loading={loading}
+              error={error}
+              onSelect={(pair) => {
+                toggleSelection(pair);
+                executeTrade({
+                  coin: pair,
+                  action: 'BUY',
+                  price: parameters.tradeAmount,
+                });
+              }}
+              onRefresh={refreshRecommendations}
+            />
+            <TradeHistory
+              trades={trades}
+              onExport={handleExport}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
-};
+}
 
 export default App;

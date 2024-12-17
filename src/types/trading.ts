@@ -1,46 +1,37 @@
-export interface Trade {
-  coin: string;
-  action: "Buy" | "Sell";
-  price: number;
-  time: string;
-  status: "OK" | "Failed";
+export interface Ticker {
+  pair: string;
+  last: number;
+  daily: number;
+  volume: number;
+  timestamp: number;
 }
 
-export interface CoinStatus {
-  name: string;
-  trend?: string;
-  volatility?: number;
-  threshold?: number;
-}
-
-export interface CoinConfig {
-  name: string;
-  trend?: string;
-  volatility?: number;
-  threshold?: number;
-}
-
-export interface TradingConfig {
+export interface TradingParameters {
   tradeAmount: number;
   profitTarget: number;
-  queryInterval: number;
+  analysisInterval: number;
   maxOpenPositions: number;
+  currency: 'TRY' | 'USDT';
 }
 
-export interface BalanceItem {
-  asset: string;
-  assetname: string;
-  balance: string;
-  locked: string;
-  free: string;
-  orderFund: string;
-  requestFund: string;
-  precision: number;
+export interface Trade {
+  coin: string;
+  action: 'BUY' | 'SELL';
+  price: number;
+  time: Date;
+  status: 'OK' | 'FAILED';
 }
 
-export interface SocketEvents {
-  trade: (trade: Trade) => void;
-  status: (status: { status: string }) => void;
-  error: (error: string) => void;
-  balance: (balance: BalanceItem[]) => void;
+export interface Strategy {
+  id: string;
+  name: string;
+  description: string;
+  isActive: boolean;
+}
+
+export interface CoinRecommendation {
+  ticker: Ticker;
+  reason: string;
+  confidence: number;
+  selected: boolean;
 }
