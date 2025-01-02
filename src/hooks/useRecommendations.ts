@@ -40,29 +40,29 @@ export function useRecommendations() {
           !isNaN(ticker.volume)
         )
         .map(ticker => {
-          const deviation = ((ticker.daily - ticker.last) / ticker.daily) * 100;
-          const confidence = Math.min(Math.abs(deviation) / 10, 1);
+          const last = Number(ticker.last);
+          const daily = Number(ticker.daily);
+          
+          // Calculate percentage difference from 24h average
+          const percentChange = ((last - daily) / daily) * 100;
+          const confidence = Math.min(Math.abs(percentChange) / 10, 1);
 
           return {
             ticker: {
               pair: ticker.pair,
-              last: Number(ticker.last),
-              daily: Number(ticker.daily),
+              last,
+              daily,
               volume: Number(ticker.volume),
               timestamp: Date.now(),
             },
-            reason: deviation >= 5 
-              ? `${deviation.toFixed(2)}% below 24-hour average price`
-              : deviation <= -5
-              ? `${Math.abs(deviation).toFixed(2)}% above 24-hour average price`
-              : 'Price within normal range',
+            reason: `${Math.abs(percentChange).toFixed(2)}% ${last > daily ? 'above' : 'below'} 24-hour average price`,
             confidence,
             selected: false,
           };
         })
-        .filter(rec => rec.confidence >= 0.4) // Only show recommendations with decent confidence
+        .filter(rec => rec.confidence >= 0.4)
         .sort((a, b) => b.confidence - a.confidence)
-        .slice(0, 10); // Show top 10 recommendations
+        .slice(0, 10);
 
       setRecommendations(newRecommendations);
     } catch (err) {
@@ -83,10 +83,9 @@ export function useRecommendations() {
     );
   }, []);
 
-  // Initial fetch and periodic updates
   useEffect(() => {
     fetchRecommendations();
-    const interval = setInterval(fetchRecommendations, 30000); // Update every 30 seconds
+    const interval = setInterval(fetchRecommendations, 30000);
     return () => clearInterval(interval);
   }, [fetchRecommendations]);
 

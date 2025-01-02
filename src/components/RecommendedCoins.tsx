@@ -1,6 +1,6 @@
-import React from "react";
-import { TrendingUp, AlertCircle, RefreshCw } from "lucide-react";
-import type { CoinRecommendation } from "../types/trading";
+import React from 'react';
+import { TrendingUp, AlertCircle, RefreshCw } from 'lucide-react';
+import type { CoinRecommendation } from '../types/trading';
 
 interface Props {
   recommendations: CoinRecommendation[];
@@ -87,64 +87,54 @@ export default function RecommendedCoins({
         </div>
       ) : (
         <div className="overflow-y-auto max-h-[500px] pr-2 -mr-2 space-y-4">
-          {recommendations.map(({ ticker, reason, confidence, selected }) => {
-            const percentageChange =
-              ((ticker.last - ticker.daily) / ticker.daily) * 100;
-
-            return (
-              <div
-                key={ticker.pair}
-                className={`flex items-start p-4 border rounded-lg transition-colors ${
-                  selected ? "bg-blue-50 border-blue-200" : "hover:bg-gray-50"
-                }`}
-              >
-                <div className="flex items-center h-5">
-                  <input
-                    id={ticker.pair}
-                    type="checkbox"
-                    checked={selected}
-                    onChange={() => onSelect(ticker.pair)}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                  />
+          {recommendations.map(({ ticker, reason, confidence, selected }) => (
+            <div
+              key={ticker.pair}
+              className={`flex items-start p-4 border rounded-lg transition-colors ${
+                selected ? 'bg-blue-50 border-blue-200' : 'hover:bg-gray-50'
+              }`}
+            >
+              <div className="flex items-center h-5">
+                <input
+                  id={ticker.pair}
+                  type="checkbox"
+                  checked={selected}
+                  onChange={() => onSelect(ticker.pair)}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+              </div>
+              <div className="ml-3 flex-1">
+                <div className="flex justify-between items-start">
+                  <label htmlFor={ticker.pair} className="font-medium text-gray-700">
+                    {ticker.pair}
+                  </label>
+                  <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                    confidence >= 0.7
+                      ? 'bg-green-100 text-green-800'
+                      : confidence >= 0.4
+                      ? 'bg-yellow-100 text-yellow-800'
+                      : 'bg-gray-100 text-gray-800'
+                  }`}>
+                    {(confidence * 100).toFixed(0)}% Confidence
+                  </span>
                 </div>
-                <div className="ml-3 flex-1">
-                  <div className="flex justify-between items-start">
-                    <label
-                      htmlFor={ticker.pair}
-                      className="font-medium text-gray-700"
-                    >
-                      {ticker.pair}
-                    </label>
-                    <span
-                      className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                        confidence >= 0.7
-                          ? "bg-green-100 text-green-800"
-                          : confidence >= 0.4
-                            ? "bg-yellow-100 text-yellow-800"
-                            : "bg-gray-100 text-gray-800"
-                      }`}
-                    >
-                      {(confidence * 100).toFixed(0)}% Confidence
-                    </span>
-                  </div>
-                  <p className="text-sm text-gray-600 mt-1">{reason}</p>
-                  <div className="mt-2 flex gap-4 text-sm">
-                    <span className="text-gray-600">
-                      Current: ${ticker.last.toFixed(2)}
-                    </span>
-                    <span className="text-gray-600">
-                      24h Avg: ${ticker.daily.toFixed(2)}
-                    </span>
-                    <span
-                      className={`font-semibold ${percentageChange < 0 ? "text-red-600" : "text-green-600"}`}
-                    >
-                      {percentageChange.toFixed(2)}%
-                    </span>
-                  </div>
+                <p className="text-sm text-gray-600 mt-1">{reason}</p>
+                <div className="mt-2 flex gap-4 text-sm">
+                  <span className="text-gray-600">
+                    Current: ${ticker.last.toFixed(2)}
+                  </span>
+                  <span className="text-gray-600">
+                    24h Avg: ${ticker.daily.toFixed(2)}
+                  </span>
+                  <span className={`font-medium ${
+                    ticker.last < ticker.daily ? 'text-red-600' : 'text-green-600'
+                  }`}>
+                    {((ticker.last - ticker.daily) / ticker.daily * 100).toFixed(2)}%
+                  </span>
                 </div>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       )}
     </div>
